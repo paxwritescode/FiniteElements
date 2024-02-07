@@ -47,6 +47,12 @@ double ComputeBasicFunction(int i, double x, double x_p, double x_i, double x_n)
         return 0;
 }
 
+
+double phi(double x, PhiParams params){
+    return ComputeBasicFunction(params.i, x, params.x_p, params.x_i, params.x_n);
+}
+
+
 double ComputeTestFunction(int i, double x, double x_p, double x_i, double x_n) // x_p = x_(i - 1), previous; x_n = x_(i + 1), next
 {
     if (x_p < x && x_i >= x)
@@ -57,7 +63,7 @@ double ComputeTestFunction(int i, double x, double x_p, double x_i, double x_n) 
         return 0;
 }
 
-double SimpsonIntegrate(double a, double b, double (*f)(double), int n)
+double SimpsonIntegrate(double a, double b, int n, PhiParams phiParams)
 {
     const double length = (b - a) / n;
 
@@ -66,53 +72,56 @@ double SimpsonIntegrate(double a, double b, double (*f)(double), int n)
     {
         const double x1 = a + step * length;
         const double x2 = a + (step + 1) * length;
-
-        simpson_integral += (x2 - x1) / 6.0 * (f(x1) + 4.0 * f(0.5 * (x1 + x2)) + f(x2));
+        simpson_integral += (x2 - x1) / 6.0 * (f(x1) * phi(x1, phiParams) + 
+        4.0 * f(0.5 * (x1 + x2)) * f(0.5 * (x1 + x2)) + f(x2) * phi(x2, phiParams));
     }
 
     return simpson_integral;
 }
 
-double GalerkinMethod(double x, double a, double b, int n, double (*f)(double))
+double GalerkinMethod(double x, double a, double b, int n)
 {
     double u_numeric = 0;
 
     // Constructing tridiagonal Matrix
-    double *d = (double *)calloc(n, sizeof(double)); // a_(j - 1)(j), upper diagonal
-    double *c = (double *)calloc(n, sizeof(double)); // a_(j)(j), main diagonal
+    double *d = (double *)calloc(n, sizeof(double));  // a_(j - 1)(j), upper diagonal
+    double *c = (double *)calloc(n, sizeof(double));  // a_(j)(j), main diagonal
     double *bm = (double *)calloc(n, sizeof(double)); // a(j + 1)(j), lower diagonal
-    double* uj = (double *)calloc(n, sizeof(double));
-    double* r = (double *)calloc(n, sizeof(double));
-    double* phi = (double *)calloc(n, sizeof(double));
-    double* fphi = (double *)calloc(n, sizeof(double));
+    double *uj = (double *)calloc(n, sizeof(double));
+    double *r = (double *)calloc(n, sizeof(double));
 
     bm[0] = 0, d[n - 1] = 0;
 
     for (int j = 0; j < n; j++)
     {
-        double x_j = ComputeRegularGridNode(a, b, j, n);
-        double x_p = ComputeRegularGridNode(a, b, j - 1, n); // previous
-        double x_n = ComputeRegularGridNode(a, b, j + 1, n); // next
+        PhiParams phi = {0};
+        phi.x_i = ComputeRegularGridNode(a, b, j, n);
+        phi.x_p = ComputeRegularGridNode(a, b, j - 1, n); // previous
+        phi.x_n = ComputeRegularGridNode(a, b, j + 1, n); // next
+        phi.i = j;
 
-        c[j] = 1 / ((x_j - x_p) * (x_j - x_p)) + 1 / ((x_n - x_j) * (x_n - x_j));
+        c[j] = 1 / ((phi.x_i - phi.x_p) * (phi.x_i - phi.x_p)) 
+        + 1 / ((phi.x_n - phi.x_i) * (phi.x_n - phi.x_i));
         if (j != 0)
-            bm[j] = - (1 / (x_n - x_j) * (x_n - x_j));
+            bm[j] = -(1 / (phi.x_n - phi.x_i) * (phi.x_n - phi.x_i));
         if (j != n - 1)
-            d[j] = - (1 / (x_j - x_p) * (x_j - x_p));
+            d[j] = -(1 / (phi.x_i - phi.x_p) * (phi.x_i - phi.x_p));
 
-        phi[j] = ComputeBasicFunction(j, x, x_p, x_j, x_n);
-        
+        r[j] = SimpsonIntegrate(a, b, n, phi);
     }
 
-
-    for (int j = 0; j < n; j++)
-        r[j] = 0;
 
     TridiagonalMatrixAlgorithm(n, r, bm, c, d, uj);
 
     for (int j = 0; j < n; j++)
     {
+        PhiParams phi = {0};
+        phi.x_i = ComputeRegularGridNode(a, b, j, n);
+        phi.x_p = ComputeRegularGridNode(a, b, j - 1, n); // previous
+        phi.x_n = ComputeRegularGridNode(a, b, j + 1, n); // next
+        phi.i = j;
 
+        u_numeric += uj[j] * ComputeBasicFunction(j, x, phi.x_p, phi.x_i, phi.x_n); //*phi_j(x)
     }
 
     free(d);
@@ -120,6 +129,6 @@ double GalerkinMethod(double x, double a, double b, int n, double (*f)(double))
     free(bm);
     free(uj);
     free(r);
-    free(phi);
-    free(fphi);
+
+    return u_numeric;
 }
