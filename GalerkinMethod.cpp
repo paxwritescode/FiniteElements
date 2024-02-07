@@ -1,10 +1,9 @@
-#include <cstdio>
-#include <cstdlib>
+#include "GalerkinMethod.h"
 
 void TridiagonalMatrixAlgorithm(int n, double *r, double *b, double *c, double *d, double *x)
 {
-    double* delta = (double*)calloc(n, sizeof(double));
-    double* lambda = (double*)calloc(n, sizeof(double));
+    double *delta = (double *)calloc(n, sizeof(double));
+    double *lambda = (double *)calloc(n, sizeof(double));
 
     delta[0] = -d[0] / c[0];
     lambda[0] = r[0] / c[0];
@@ -23,4 +22,104 @@ void TridiagonalMatrixAlgorithm(int n, double *r, double *b, double *c, double *
 
     free(delta);
     free(lambda);
+}
+
+double ComputeRegularGridNode(double a, double b, int i, int n)
+{
+    double h = (b - a) / n;
+    return a + i * h;
+}
+
+double ComputeAdaptiveGridNode(double a, double b, int i, int n)
+{
+    // TODO choose a function
+    double h = (b - a) / n;
+    return a + i * h;
+}
+
+double ComputeBasicFunction(int i, double x, double x_p, double x_i, double x_n) // x_p = x_(i - 1), previous; x_n = x_(i + 1), next
+{
+    if (x_p < x && x_i >= x)
+        return (x - x_p) / (x_i - x_p);
+    else if (x_i < x && x_n >= x)
+        return (x_n - x) / (x_n - x_i);
+    else
+        return 0;
+}
+
+double ComputeTestFunction(int i, double x, double x_p, double x_i, double x_n) // x_p = x_(i - 1), previous; x_n = x_(i + 1), next
+{
+    if (x_p < x && x_i >= x)
+        return 1 / (x_i - x_p);
+    else if (x_i < x && x_n >= x)
+        return -1 / (x_n - x_i);
+    else
+        return 0;
+}
+
+double SimpsonIntegrate(double a, double b, double (*f)(double), int n)
+{
+    const double length = (b - a) / n;
+
+    double simpson_integral = 0;
+    for (int step = 0; step < n; step++)
+    {
+        const double x1 = a + step * length;
+        const double x2 = a + (step + 1) * length;
+
+        simpson_integral += (x2 - x1) / 6.0 * (f(x1) + 4.0 * f(0.5 * (x1 + x2)) + f(x2));
+    }
+
+    return simpson_integral;
+}
+
+double GalerkinMethod(double x, double a, double b, int n, double (*f)(double))
+{
+    double u_numeric = 0;
+
+    // Constructing tridiagonal Matrix
+    double *d = (double *)calloc(n, sizeof(double)); // a_(j - 1)(j), upper diagonal
+    double *c = (double *)calloc(n, sizeof(double)); // a_(j)(j), main diagonal
+    double *bm = (double *)calloc(n, sizeof(double)); // a(j + 1)(j), lower diagonal
+    double* uj = (double *)calloc(n, sizeof(double));
+    double* r = (double *)calloc(n, sizeof(double));
+    double* phi = (double *)calloc(n, sizeof(double));
+    double* fphi = (double *)calloc(n, sizeof(double));
+
+    bm[0] = 0, d[n - 1] = 0;
+
+    for (int j = 0; j < n; j++)
+    {
+        double x_j = ComputeRegularGridNode(a, b, j, n);
+        double x_p = ComputeRegularGridNode(a, b, j - 1, n); // previous
+        double x_n = ComputeRegularGridNode(a, b, j + 1, n); // next
+
+        c[j] = 1 / ((x_j - x_p) * (x_j - x_p)) + 1 / ((x_n - x_j) * (x_n - x_j));
+        if (j != 0)
+            bm[j] = - (1 / (x_n - x_j) * (x_n - x_j));
+        if (j != n - 1)
+            d[j] = - (1 / (x_j - x_p) * (x_j - x_p));
+
+        phi[j] = ComputeBasicFunction(j, x, x_p, x_j, x_n);
+        
+    }
+
+
+    for (int j = 0; j < n; j++)
+        r[j] = 0;
+
+    TridiagonalMatrixAlgorithm(n, r, bm, c, d, uj);
+
+    for (int j = 0; j < n; j++)
+    {
+
+    }
+
+    free(d);
+    free(c);
+    free(bm);
+    free(uj);
+    free(r);
+    free(phi);
+    free(fphi);
 }
