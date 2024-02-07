@@ -1,25 +1,26 @@
-#include <iostream>
-#include <iomanip>
+#include <cstdio>
+#include <cstdlib>
 
-void TridiagonalMatrixAlgorithm(int n, double *a, double *b, double *c, double *d, double *x)
+void TridiagonalMatrixAlgorithm(int n, double *r, double *b, double *c, double *d, double *x)
 {
-    //a - lower diagonal
-    //b - main diagonal
-    //c - upper diagonal
-    //d - right hand side
+    double* delta = (double*)calloc(n, sizeof(double));
+    double* lambda = (double*)calloc(n, sizeof(double));
 
-    // Forward elimination
-    for (int i = 1; i < n; ++i)
+    delta[0] = -d[0] / c[0];
+    lambda[0] = r[0] / c[0];
+
+    for (int i = 1; i < n; i++)
     {
-        double factor = a[i] / b[i - 1];
-        b[i] -= factor * c[i - 1];
-        d[i] -= factor * d[i - 1];
+        delta[i] = -d[i] / (c[i] + b[i] * delta[i - 1]);
+        lambda[i] = (r[i] - b[i] * lambda[i - 1]) / (c[i] + delta[i - 1] * b[i]);
     }
 
-    // Backward substitution
-    x[n - 1] = d[n - 1] / b[n - 1];
-    for (int i = n - 2; i >= 0; --i)
+    x[n - 1] = lambda[n - 1];
+    for (int i = n - 2; i >= 0; i--)
     {
-        x[i] = (d[i] - c[i] * x[i + 1]) / b[i];
+        x[i] = delta[i] * x[i + 1] + lambda[i];
     }
+
+    free(delta);
+    free(lambda);
 }

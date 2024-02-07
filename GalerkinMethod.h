@@ -1,1 +1,1 @@
-void TridiagonalMatrixAlgorithm(int n, double *a, double *b, double *c, double *d, double *x);
+void TridiagonalMatrixAlgorithm(int n, double *r, double *b, double *c, double *d, double *x);
