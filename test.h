@@ -3,4 +3,4 @@
 #include <cmath>
 #include "GalerkinMethod.h"
 
-void TestSimpson();
+void Test();
