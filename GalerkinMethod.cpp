@@ -37,28 +37,13 @@ double ComputeAdaptiveGridNode(double a, double b, int i, int n)
     return a + i * h;
 }
 
-double ComputeBasicFunction(int i, double x, double x_p, double x_i, double x_n) // x_p = x_(i - 1), previous; x_n = x_(i + 1), next
-{
-    if (x_p < x && x_i >= x)
-        return (x - x_p) / (x_i - x_p);
-    else if (x_i < x && x_n >= x)
-        return (x_n - x) / (x_n - x_i);
-    else
-        return 0;
-}
-
 
 double phi(double x, PhiParams params){
-    return ComputeBasicFunction(params.i, x, params.x_p, params.x_i, params.x_n);
-}
-
-
-double ComputeTestFunction(int i, double x, double x_p, double x_i, double x_n) // x_p = x_(i - 1), previous; x_n = x_(i + 1), next
-{
-    if (x_p < x && x_i >= x)
-        return 1 / (x_i - x_p);
-    else if (x_i < x && x_n >= x)
-        return -1 / (x_n - x_i);
+    // x_p = x_(i - 1), previous; x_n = x_(i + 1), next
+    if (params.x_p < x && params.x_i >= x)
+        return (x - params.x_p) / (params.x_i - params.x_p);
+    else if (params.x_i < x && params.x_n >= x)
+        return (params.x_n - x) / (params.x_n - params.x_i);
     else
         return 0;
 }
@@ -94,20 +79,19 @@ double GalerkinMethod(double x, double a, double b, int n)
 
     for (int j = 0; j < n; j++)
     {
-        PhiParams phi = {0};
-        phi.x_i = ComputeRegularGridNode(a, b, j, n);
-        phi.x_p = ComputeRegularGridNode(a, b, j - 1, n); // previous
-        phi.x_n = ComputeRegularGridNode(a, b, j + 1, n); // next
-        phi.i = j;
+        PhiParams phiParams = {};
+        phiParams.x_i = ComputeRegularGridNode(a, b, j, n);
+        phiParams.x_p = ComputeRegularGridNode(a, b, j - 1, n); // previous
+        phiParams.x_n = ComputeRegularGridNode(a, b, j + 1, n); // next
 
-        c[j] = 1 / ((phi.x_i - phi.x_p) * (phi.x_i - phi.x_p)) 
-        + 1 / ((phi.x_n - phi.x_i) * (phi.x_n - phi.x_i));
+        c[j] = 1 / ((phiParams.x_i - phiParams.x_p) * (phiParams.x_i - phiParams.x_p)) 
+        + 1 / ((phiParams.x_n - phiParams.x_i) * (phiParams.x_n - phiParams.x_i));
         if (j != 0)
-            bm[j] = -(1 / (phi.x_n - phi.x_i) * (phi.x_n - phi.x_i));
+            bm[j] = -(1 / (phiParams.x_n - phiParams.x_i) * (phiParams.x_n - phiParams.x_i));
         if (j != n - 1)
-            d[j] = -(1 / (phi.x_i - phi.x_p) * (phi.x_i - phi.x_p));
+            d[j] = -(1 / (phiParams.x_i - phiParams.x_p) * (phiParams.x_i - phiParams.x_p));
 
-        r[j] = SimpsonIntegrate(20, f, phi);
+        r[j] = SimpsonIntegrate(20, f, phiParams);
     }
 
 
@@ -115,13 +99,12 @@ double GalerkinMethod(double x, double a, double b, int n)
 
     for (int j = 0; j < n; j++)
     {
-        PhiParams phi = {0};
-        phi.x_i = ComputeRegularGridNode(a, b, j, n);
-        phi.x_p = ComputeRegularGridNode(a, b, j - 1, n); // previous
-        phi.x_n = ComputeRegularGridNode(a, b, j + 1, n); // next
-        phi.i = j;
+        PhiParams phiParams = {0};
+        phiParams.x_i = ComputeRegularGridNode(a, b, j, n);
+        phiParams.x_p = ComputeRegularGridNode(a, b, j - 1, n); // previous
+        phiParams.x_n = ComputeRegularGridNode(a, b, j + 1, n); // next
 
-        u_numeric += uj[j] * ComputeBasicFunction(j, x, phi.x_p, phi.x_i, phi.x_n); //*phi_j(x)
+        u_numeric += uj[j] * phi(x, phiParams); //*phi_j(x)
     }
 
     free(d);

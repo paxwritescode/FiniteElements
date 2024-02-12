@@ -6,7 +6,6 @@
 #include "functions.h"
 
 struct PhiParams{
-    int i;
     double x_p;
     double x_i;
     double x_n;
