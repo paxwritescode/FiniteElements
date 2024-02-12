@@ -63,17 +63,17 @@ double ComputeTestFunction(int i, double x, double x_p, double x_i, double x_n) 
         return 0;
 }
 
-double SimpsonIntegrate(double a, double b, int n, PhiParams phiParams)
+double SimpsonIntegrate(int n, double (*func)(double), PhiParams phiParams) //TODO 76 line f * phi
 {
-    const double length = (b - a) / n;
+    const double length = (phiParams.x_n - phiParams.x_p) / n;
 
     double simpson_integral = 0;
     for (int step = 0; step < n; step++)
     {
-        const double x1 = a + step * length;
-        const double x2 = a + (step + 1) * length;
-        simpson_integral += (x2 - x1) / 6.0 * (f(x1) * phi(x1, phiParams) + 
-        4.0 * f(0.5 * (x1 + x2)) * f(0.5 * (x1 + x2)) + f(x2) * phi(x2, phiParams));
+        const double x1 = phiParams.x_p + step * length;
+        const double x2 = phiParams.x_p + (step + 1) * length;
+        simpson_integral += (x2 - x1) / 6.0 * (func(x1) * phi(x1, phiParams) + 
+        4.0 * func(0.5 * (x1 + x2)) * func(0.5 * (x1 + x2)) + func(x2) * phi(x2, phiParams));
     }
 
     return simpson_integral;
@@ -107,7 +107,7 @@ double GalerkinMethod(double x, double a, double b, int n)
         if (j != n - 1)
             d[j] = -(1 / (phi.x_i - phi.x_p) * (phi.x_i - phi.x_p));
 
-        r[j] = SimpsonIntegrate(a, b, n, phi);
+        r[j] = SimpsonIntegrate(20, f, phi);
     }
 
 

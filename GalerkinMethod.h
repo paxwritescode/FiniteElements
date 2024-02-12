@@ -14,5 +14,5 @@ struct PhiParams{
 typedef struct PhiParams PhiParams;
 
 void TridiagonalMatrixAlgorithm(int n, double *r, double *b, double *c, double *d, double *x);
-double SimpsonIntegrate(double a, double b, int n, PhiParams phiParams);
+double SimpsonIntegrate(int n, double (*func)(double), PhiParams phiParams);
 double GalerkinMethod(double x, double a, double b, int n);
