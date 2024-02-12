@@ -5,12 +5,12 @@
 
 int main(void)
 {
-    // for (double x = _A_; x <= _B_; x += 0.1)
-    // {
-    //     printf("%lf, ", GalerkinMethod(x, _A_, _B_, 5));
-    // }
+    for (double x = _A_; x <= _B_; x += 0.1)
+    {
+        printf("%lf, ", GalerkinMethod(x, _A_, _B_, 5));
+    }
 
-    TestSimpson();
+    //TestSimpson();
     
     return 0;
 }

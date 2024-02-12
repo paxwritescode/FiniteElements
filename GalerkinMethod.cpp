@@ -73,7 +73,7 @@ double SimpsonIntegrate(int n, double (*func)(double), PhiParams phiParams) //TO
         const double x1 = phiParams.x_p + step * length;
         const double x2 = phiParams.x_p + (step + 1) * length;
         simpson_integral += (x2 - x1) / 6.0 * (func(x1) * phi(x1, phiParams) + 
-        4.0 * func(0.5 * (x1 + x2)) * func(0.5 * (x1 + x2)) + func(x2) * phi(x2, phiParams));
+        4.0 * func(0.5 * (x1 + x2)) * phi(0.5 * (x1 + x2), phiParams) + func(x2) * phi(x2, phiParams));
     }
 
     return simpson_integral;
