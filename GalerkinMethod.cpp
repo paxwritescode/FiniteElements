@@ -84,12 +84,12 @@ double GalerkinMethod(double x, double a, double b, int n)
         phiParams.x_p = ComputeRegularGridNode(a, b, j - 1, n); // previous
         phiParams.x_n = ComputeRegularGridNode(a, b, j + 1, n); // next
 
-        c[j] = 1 / ((phiParams.x_i - phiParams.x_p) * (phiParams.x_i - phiParams.x_p)) 
-        + 1 / ((phiParams.x_n - phiParams.x_i) * (phiParams.x_n - phiParams.x_i));
+        c[j] = 1 / (phiParams.x_i - phiParams.x_p)
+        + 1 / (phiParams.x_n - phiParams.x_i);
         if (j != 0)
-            bm[j] = -(1 / (phiParams.x_n - phiParams.x_i) * (phiParams.x_n - phiParams.x_i));
+            bm[j] = -1 / (phiParams.x_n - phiParams.x_i);
         if (j != n - 1)
-            d[j] = -(1 / (phiParams.x_i - phiParams.x_p) * (phiParams.x_i - phiParams.x_p));
+            d[j] = -1 / (phiParams.x_i - phiParams.x_p);
 
         r[j] = SimpsonIntegrate(20, f, phiParams);
     }
