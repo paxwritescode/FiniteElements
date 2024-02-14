@@ -5,9 +5,9 @@
 
 int main(void)
 {
-    int n;
-    printf("Input a number of nodes: ");
-    scanf("%d", &n);
+    int n = 10;
+    // printf("Input a number of nodes: ");
+    // scanf("%d", &n);
 
     double* uj = (double*)calloc(n, sizeof(double));
     GalerkinMethod(_A_, _B_, n, uj);
