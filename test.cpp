@@ -7,7 +7,7 @@ double TestFunc(double x)
 
 void TestSimpson()
 {
-    printf("%lf - Simpson computed\n", SimpsonIntegrate(100, TestFunc, PhiParams{0, PI/2, PI}));
+    printf("%lf - Simpson computed\n", SimpsonIntegrate(100, TestFunc, PhiParams{0, PI/2, PI}, 0, PI));
     printf("%lf - exact\n", 4/PI);
 }
 

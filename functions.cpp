@@ -3,7 +3,7 @@
 
 double f(double x)
 {
-    return PI * cos(PI * x / 2) - PI * PI / 4 * x * sin(PI * x / 2);
+    return - PI * cos(PI * x / 2) + PI * PI / 4 * x * sin(PI * x / 2);
     //return 1;
 }
 

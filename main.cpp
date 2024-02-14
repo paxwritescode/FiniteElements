@@ -5,7 +5,7 @@
 
 int main(void)
 {
-    int n = 10;
+    int n;
     printf("Input a number of nodes: ");
     scanf("%d", &n);
 
