@@ -37,8 +37,8 @@ double ComputeAdaptiveGridNode(double a, double b, int i, int n)
     return a + i * h;
 }
 
-
-double phi(double x, PhiParams params){
+double phi(double x, PhiParams params)
+{
     // x_p = x_(i - 1), previous; x_n = x_(i + 1), next
     if (params.x_p < x && params.x_i >= x)
         return (x - params.x_p) / (params.x_i - params.x_p);
@@ -48,7 +48,7 @@ double phi(double x, PhiParams params){
         return 0;
 }
 
-double SimpsonIntegrate(int n, double (*func)(double), PhiParams phiParams) //TODO 76 line f * phi
+double SimpsonIntegrate(int n, double (*func)(double), PhiParams phiParams) // TODO 76 line f * phi
 {
     const double length = (phiParams.x_n - phiParams.x_p) / n;
 
@@ -57,22 +57,18 @@ double SimpsonIntegrate(int n, double (*func)(double), PhiParams phiParams) //TO
     {
         const double x1 = phiParams.x_p + step * length;
         const double x2 = phiParams.x_p + (step + 1) * length;
-        simpson_integral += (x2 - x1) / 6.0 * (func(x1) * phi(x1, phiParams) + 
-        4.0 * func(0.5 * (x1 + x2)) * phi(0.5 * (x1 + x2), phiParams) + func(x2) * phi(x2, phiParams));
+        simpson_integral += (x2 - x1) / 6.0 * (func(x1) * phi(x1, phiParams) + 4.0 * func(0.5 * (x1 + x2)) * phi(0.5 * (x1 + x2), phiParams) + func(x2) * phi(x2, phiParams));
     }
 
     return simpson_integral;
 }
 
-double GalerkinMethod(double x, double a, double b, int n)
+double* GalerkinMethod(double a, double b, int n, double* uj)
 {
-    double u_numeric = 0;
-
     // Constructing tridiagonal Matrix
     double *d = (double *)calloc(n, sizeof(double));  // a_(j - 1)(j), upper diagonal
     double *c = (double *)calloc(n, sizeof(double));  // a_(j)(j), main diagonal
     double *bm = (double *)calloc(n, sizeof(double)); // a(j + 1)(j), lower diagonal
-    double *uj = (double *)calloc(n, sizeof(double));
     double *r = (double *)calloc(n, sizeof(double));
 
     bm[0] = 0, d[n - 1] = 0;
@@ -84,8 +80,7 @@ double GalerkinMethod(double x, double a, double b, int n)
         phiParams.x_p = ComputeRegularGridNode(a, b, j - 1, n); // previous
         phiParams.x_n = ComputeRegularGridNode(a, b, j + 1, n); // next
 
-        c[j] = 1 / (phiParams.x_i - phiParams.x_p)
-        + 1 / (phiParams.x_n - phiParams.x_i);
+        c[j] = 1 / (phiParams.x_i - phiParams.x_p) + 1 / (phiParams.x_n - phiParams.x_i);
         if (j != 0)
             bm[j] = -1 / (phiParams.x_n - phiParams.x_i);
         if (j != n - 1)
@@ -94,8 +89,21 @@ double GalerkinMethod(double x, double a, double b, int n)
         r[j] = SimpsonIntegrate(20, f, phiParams);
     }
 
-
     TridiagonalMatrixAlgorithm(n, r, bm, c, d, uj);
+
+
+    free(d);
+    free(c);
+    free(bm);
+    free(r);
+
+    return uj;
+}
+
+double ComputeGalerkinSolution(double x, double a, double b, int n, double* uj)
+{
+    double u_numeric = 0;
+
 
     for (int j = 0; j < n; j++)
     {
@@ -106,12 +114,6 @@ double GalerkinMethod(double x, double a, double b, int n)
 
         u_numeric += uj[j] * phi(x, phiParams); //*phi_j(x)
     }
-
-    free(d);
-    free(c);
-    free(bm);
-    free(uj);
-    free(r);
 
     return u_numeric;
 }
