@@ -40,8 +40,8 @@ double ComputeAdaptiveGridNode(double a, double b, int i, int n)
 double phi(double x, PhiParams params, double a, double b)
 {
     // x_p = x_(i - 1), previous; x_n = x_(i + 1), next
-    // if (x < a || x > b)
-    //     return 0;
+    if (x < a || x > b)
+        return 0;
     if (params.x_p < x && params.x_i >= x)
         return (x - params.x_p) / (params.x_i - params.x_p);
     else if (params.x_i < x && params.x_n >= x)
