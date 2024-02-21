@@ -65,3 +65,13 @@ PhiParams FillPhiParams(double a, double b, int n, int j)
     return phiParams;
 }
 
+double ComputeErrorNorm(double* array1, double* array2, int n)
+{
+    double norm = 0;
+    for(int i = 0; i < n; i++)
+    {
+        norm += sqrt((array1[i] - array2[i]) * (array1[i] - array2[i]));
+    }
+
+    return norm;
+}
