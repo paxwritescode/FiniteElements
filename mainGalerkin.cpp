@@ -14,7 +14,7 @@ int main(void)
 
     for (double x = _A_; x <= _B_ + 0.0001; x += 0.1)
     {
-        printf("%lf, ", ComputeGalerkinSolution(x, _A_, _B_, n, uj));
+        printf("%lf, ", ComputeSolution(x, _A_, _B_, n, uj));
     }
 
     printf("\n\n");

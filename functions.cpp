@@ -39,6 +39,19 @@ double phi(double x, PhiParams params, double a, double b)
         return 0;
 }
 
+double der_phi(double x, PhiParams params, double a, double b)
+{
+    // x_p = x_(i - 1), previous; x_n = x_(i + 1), next
+    if (x < a || x > b)
+        return 0;
+    if (params.x_p < x && params.x_i >= x)
+        return 1 / (params.x_i - params.x_p);
+    else if (params.x_i < x && params.x_n >= x)
+        return -1 / (params.x_n - params.x_i);
+    else
+        return 0;
+}
+
 double SimpsonIntegrate(int n, double (*func)(double), PhiParams phiParams, double a, double b)
 {
     const double length = (phiParams.x_n - phiParams.x_p) / n;
@@ -74,4 +87,18 @@ double ComputeErrorNorm(double* array1, double* array2, int n)
     }
 
     return norm;
+}
+
+double ComputeSolution(double x, double a, double b, int n, double *uj)
+{
+    double u_numeric = 0;
+
+    for (int j = 0; j < n; j++)
+    {
+        PhiParams phiParams = FillPhiParams(a, b, n, j);
+
+        u_numeric += uj[j] * phi(x, phiParams, a, b);
+    }
+
+    return u_numeric;
 }

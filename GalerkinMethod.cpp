@@ -47,7 +47,7 @@ void GalerkinMethod(double a, double b, int n, double *uj)
         if (j != n - 1)
             d[j] = -1 / (phiParams.x_i - phiParams.x_p);
 
-        r[j] = SimpsonIntegrate(20, f, phiParams, a, b);
+        r[j] = SimpsonIntegrate(100, f, phiParams, a, b);
     }
 
     TridiagonalMatrixAlgorithm(n, r, bm, c, d, uj);
@@ -58,18 +58,4 @@ void GalerkinMethod(double a, double b, int n, double *uj)
     free(r);
 
     //return uj;
-}
-
-double ComputeGalerkinSolution(double x, double a, double b, int n, double *uj)
-{
-    double u_numeric = 0;
-
-    for (int j = 0; j < n; j++)
-    {
-        PhiParams phiParams = FillPhiParams(a, b, n, j);
-
-        u_numeric += uj[j] * phi(x, phiParams, a, b);
-    }
-
-    return u_numeric;
 }

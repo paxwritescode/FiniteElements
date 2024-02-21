@@ -19,6 +19,8 @@ double u_exact(double x);
 double ComputeRegularGridNode(double a, double b, int i, int n);
 double ComputeAdaptiveGridNode(double a, double b, int i, int n);
 double phi(double x, PhiParams params, double a, double b);
+double der_phi(double x, PhiParams params, double a, double b);
 double SimpsonIntegrate(int n, double (*func)(double), PhiParams phiParams, double a, double b);
 PhiParams FillPhiParams(double a, double b, int n, int j);
 double ComputeErrorNorm(double* array1, double* array2, int n);
+double ComputeSolution(double x, double a, double b, int n, double *uj);

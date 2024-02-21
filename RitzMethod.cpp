@@ -1,9 +1,16 @@
 #include "RitzMethod.h"
 #include "functions.h"
 
-double ComputeFunctionalValue(int N, double *c, double (*func)(double))
+double ComputeFunctionalValue(int N, double *c, double (*func)(double), double a, double b)
 {
-    return 0;
+    // J1 = int_a^b u'^2 dx
+    double J1 = 0;
+    // J2 = int_a^b f * u dx
+    double J2 = 0;
+    // J - J1 - J2
+    J2 = 0;
+    double J = 0;
+    return J;
 }
 
 double MinBetween3Numbers(double a, double b, double c)
@@ -18,7 +25,7 @@ double MinBetween3Numbers(double a, double b, double c)
 
 double *RitzMethod(int N, double a, double b) // N is the number of basic functions
 {
-    //RETURNS: an array of coefficients c_j
+    // RETURNS: an array of coefficients c_j
     double *c = (double *)calloc(N, sizeof(double));
     // init the array of coefficients by random values from -1 to 1
     for (int j = 0; j < N; j++)
@@ -37,13 +44,13 @@ double *RitzMethod(int N, double a, double b) // N is the number of basic functi
 
         // 1) c_j - delta
         c[j] -= DELTA;
-        double J1 = ComputeFunctionalValue(N, c, f);
+        double J1 = ComputeFunctionalValue(N, c, f, a, b);
         // 2) c_j
         c[j] += DELTA;
-        double J2 = ComputeFunctionalValue(N, c, f);
+        double J2 = ComputeFunctionalValue(N, c, f, a, b);
         // 3) c_j + delta
         c[j] += DELTA;
-        double J3 = ComputeFunctionalValue(N, c, f);
+        double J3 = ComputeFunctionalValue(N, c, f, a, b);
 
         if (MinBetween3Numbers(J1, J2, J3) == J1)
             c[j] -= 2 * DELTA;
