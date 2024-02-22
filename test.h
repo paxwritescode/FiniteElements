@@ -4,3 +4,4 @@
 #include "GalerkinMethod.h"
 
 void Test();
+void TestTridiagonal();

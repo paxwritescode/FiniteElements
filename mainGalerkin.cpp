@@ -5,6 +5,10 @@
 
 int main(void)
 {
+    printf("Hello, Galerkin! \n\n");
+
+    TestTridiagonal();
+
     int n = 10;
     // printf("Input a number of nodes: ");
     // scanf("%d", &n);

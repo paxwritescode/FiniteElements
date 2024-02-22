@@ -3,14 +3,14 @@
 
 double f(double x)
 {
-    return - PI * cos(PI * x / 2) + PI * PI / 4 * x * sin(PI * x / 2);
-    //return 1;
+    //return - PI * cos(PI * x / 2) + PI * PI / 4 * x * sin(PI * x / 2);
+    return 1;
 }
 
 double u_exact(double x)
 {
-    return x * sin(PI * x / 2);
-    //return -x * x / 2 + 0.5;
+    //return x * sin(PI * x / 2);
+    return -x * x / 2 + 0.5;
 }
 
 double ComputeRegularGridNode(double a, double b, int i, int n)
@@ -55,6 +55,38 @@ double der_phi(double x, PhiParams params, double a, double b)
 double SimpsonIntegrate(int n, double (*func)(double), PhiParams phiParams, double a, double b)
 {
     const double length = (phiParams.x_n - phiParams.x_p) / n;
+
+    double simpson_integral = 0;
+    for (int step = 0; step < n; step++)
+    {
+        const double x1 = phiParams.x_p + step * length;
+        const double x2 = phiParams.x_p + (step + 1) * length;
+        simpson_integral += (x2 - x1) / 6.0 * (func(x1) * phi(x1, phiParams, a, b) + 4.0 * func(0.5 * (x1 + x2)) * phi(0.5 * (x1 + x2), phiParams, a, b) + func(x2) * phi(x2, phiParams, a, b));
+    }
+
+    return simpson_integral;
+}
+
+double SimpsonIntegrate0(int n, double (*func)(double), PhiParams phiParams, double a, double b)
+{
+    const double length = (phiParams.x_n - phiParams.x_i) / n;
+
+    double simpson_integral = 0;
+    for (int step = 0; step < n; step++)
+    {
+        const double x1 = phiParams.x_i + step * length;
+        const double x2 = phiParams.x_i + (step + 1) * length;
+        simpson_integral += (x2 - x1) / 6.0 * (func(x1) * phi(x1, phiParams, a, b) +
+         4.0 * func(0.5 * (x1 + x2)) * phi(0.5 * (x1 + x2), phiParams, a, b) 
+         + func(x2) * phi(x2, phiParams, a, b));
+    }
+
+    return simpson_integral;
+}
+
+double SimpsonIntegraten(int n, double (*func)(double), PhiParams phiParams, double a, double b)
+{
+    const double length = (phiParams.x_i - phiParams.x_p / n);
 
     double simpson_integral = 0;
     for (int step = 0; step < n; step++)

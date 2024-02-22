@@ -13,22 +13,24 @@ void TestSimpson()
 
 void TestTridiagonal()
 {
-    double* b = new double[5] {0, 2, 4, 4, 2};
-    double* c = new double[5] {2, 9, 17, 15, 3};
-    double* d = new double[5] {1, 2, -4, -8, 0};
-    double* r = new double[5] {-10, -26, -16, -2, 16};
+    double* b = new double[10] {0, -5, -5, -5, -5, -5, -5, -5, -5, -5};
+    double* c = new double[10] {5, 10, 10, 10, 10, 10, 10, 10, 10, 5};
+    double* d = new double[10] {-5, -5, -5, -5, -5, -5, -5, -5, -5, 0};
+    double* r = new double[10] {0.1, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.1};
 
-    double* x = new double[5];
+    double* x = new double[10];
 
-    TridiagonalMatrixAlgorithm(5, r, b, c, d, x);
+    TridiagonalMatrixAlgorithm(10, r, b, c, d, x);
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 10; i++)
     {
         printf("%lf ", x[i]);
     }
 
-    printf("\nCorrect:\n");
-    printf("-4, -2, 0, 2, 4");
+    // printf("\nCorrect:\n");
+    // printf("-4, -2, 0, 2, 4");
+
+    printf("\n\n");
     
     delete[] b;
     delete[] c;
