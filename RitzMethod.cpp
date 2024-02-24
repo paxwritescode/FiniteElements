@@ -99,6 +99,10 @@ double *RitzMethod(int N, double a, double b) // N is the number of basic functi
     int CountOfIterations = 0;
     int CountOfIterations_Max = 1e6;
 
+    double* deltas = new double[N];
+    for (int i = 0; i < N; i++)
+        deltas[i] = DELTA_START;
+
     while (ComputeErrorNorm(c, c_prev, N) > EPS && CountOfIterations <= CountOfIterations_Max)
     {
         for (int j = 0; j < N; j++)
@@ -107,19 +111,22 @@ double *RitzMethod(int N, double a, double b) // N is the number of basic functi
         int j = rand() % N;
 
         // 1) c_j - delta
-        c[j] -= DELTA;
+        c[j] -= deltas[j];
         double J1 = ComputeFunctionalValue(N, c, f, a, b);
         // 2) c_j
-        c[j] += DELTA;
+        c[j] += deltas[j];
         double J2 = ComputeFunctionalValue(N, c, f, a, b);
         // 3) c_j + delta
-        c[j] += DELTA;
+        c[j] += deltas[j];
         double J3 = ComputeFunctionalValue(N, c, f, a, b);
 
         if (MinBetween3Numbers(J1, J2, J3) == J1)
-            c[j] -= 2 * DELTA;
-        else if (MinBetween3Numbers(J1, J2, J3) == J2)
-            c[j] -= DELTA;
+            c[j] -= 2 * deltas[j];
+        else if (MinBetween3Numbers(J1, J2, J3) == J2) // we need to decrease delta
+        {
+            c[j] -= deltas[j];
+            deltas[j] /= 2;
+        }
         else
             continue;
 
@@ -130,5 +137,7 @@ double *RitzMethod(int N, double a, double b) // N is the number of basic functi
         printf("The method did not converge!!!\n\n");
 
     free(c_prev);
+    delete[] deltas;
+
     return c;
 }
