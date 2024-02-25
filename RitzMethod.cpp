@@ -2,7 +2,7 @@
 #include "functions.h"
 
 /** Calculate integral from a to b of (u')^2
- * @param N: number of basic functions
+ * @param N: index of rightmost node (= number_of_basic_functions - 1)
  * @param c: array of coefficients c_i, i from 0 to N-1
  * @param a: left boundary
  * @param b: right boundary
@@ -11,15 +11,15 @@ double ComputeJ1(const int N, const double *const c, const double a, const doubl
 {
     double res = 0;
     // main diagonal
-    for (int j = 1; j < N - 1; j++)
+    for (int j = 1; j < N; j++)
     {
         double x_p = ComputeRegularGridNode(a, b, j - 1, N); // x_{j - 1}
         double x_j = ComputeRegularGridNode(a, b, j, N);
         double x_n = ComputeRegularGridNode(a, b, j + 1, N); // x_{j + 1}
         res += c[j] * c[j] * (1 / (x_j - x_p) + 1 / (x_n - x_j));
     }
-    res += c[0] * c[0] * (1 / ComputeRegularGridNode(a, b, 1, N) - a);
-    res += c[N - 1] * c[N - 1] * (b - ComputeRegularGridNode(a, b, N - 1, N));
+    res += c[0] * c[0] * (1 / (ComputeRegularGridNode(a, b, 1, N) - a));
+    res += c[N] * c[N] * (1 / (b - ComputeRegularGridNode(a, b, N, N)));
 
     // upper diagonal
     for (int j = 1; j < N; j++)
@@ -55,7 +55,7 @@ double ComputeJ2(const int N, const double *const c, double(*func)(double), cons
     for (int j = 0; j < N; j++)
     {
         PhiParams phiParams = FillPhiParams(a, b, N, j);
-        res += c[j] * SimpsonIntegrate(20, func, phiParams, phiParams.x_i, phiParams.x_n);
+        res += c[j] * SimpsonIntegrate(20, func, phiParams, phiParams.x_p, phiParams.x_n);
     }
 
     return res;
@@ -68,7 +68,7 @@ double ComputeFunctionalValue(int N, double *c, double (*func)(double), double a
     // J2 = int_a^b f * u dx
     double J2 = ComputeJ2(N, c, func, a, b);
 
-    double J = J1 - J2;
+    double J = J1 / 2 - J2;
 
     return J;
 }
@@ -86,24 +86,30 @@ double MinBetween3Numbers(double a, double b, double c)
 double *RitzMethod(int N, double a, double b) // N is the number of basic functions
 {
     // RETURNS: an array of coefficients c_j
-    double *c = (double *)calloc(N, sizeof(double));
+    double *c = (double *)calloc(N + 1, sizeof(double));
     // init the array of coefficients by random values from -1 to 1
-    for (int j = 0; j < N; j++)
+    srand(1);
+    for (int j = 0; j < N + 1; j++)
     {
         int random_integer = rand();
         double random_value = ((double)random_integer / RAND_MAX) * 2.0 - 1.0;
-        c[j] = random_value;
+        // c[j] = random_value;
+        c[j] = 1;
     }
 
     double *c_prev = (double *)calloc(N, sizeof(double));
     int CountOfIterations = 0;
-    int CountOfIterations_Max = 1e6;
+    int CountOfIterations_Max = 200;
 
     double* deltas = new double[N];
     for (int i = 0; i < N; i++)
         deltas[i] = DELTA_START;
 
-    while (ComputeErrorNorm(c, c_prev, N) > EPS && CountOfIterations <= CountOfIterations_Max)
+    while (
+    //     ComputeErrorNorm(c, c_prev, N) > EPS 
+    // && 
+    CountOfIterations <= CountOfIterations_Max
+    )
     {
         for (int j = 0; j < N; j++)
             c_prev[j] = c[j];
