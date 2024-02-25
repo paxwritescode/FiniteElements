@@ -19,10 +19,10 @@ double ComputeJ1(const int N, const double *const c, const double a, const doubl
         res += c[j] * c[j] * (1 / (x_j - x_p) + 1 / (x_n - x_j));
     }
     res += c[0] * c[0] * (1 / (ComputeRegularGridNode(a, b, 1, N) - a));
-    res += c[N] * c[N] * (1 / (b - ComputeRegularGridNode(a, b, N, N)));
+    res += c[N] * c[N] * (1 / (b - ComputeRegularGridNode(a, b, N - 1, N)));
 
     // upper diagonal
-    for (int j = 1; j < N; j++)
+    for (int j = 1; j <= N; j++)
     {
         double x_p = ComputeRegularGridNode(a, b, j - 1, N); // x_{j - 1}
         double x_j = ComputeRegularGridNode(a, b, j, N);
@@ -30,7 +30,7 @@ double ComputeJ1(const int N, const double *const c, const double a, const doubl
     }
 
     // lower diagonal
-    for (int j = 0; j < N - 1; j++)
+    for (int j = 0; j <= N - 1; j++)
     {
         double x_j = ComputeRegularGridNode(a, b, j, N);
         double x_n = ComputeRegularGridNode(a, b, j + 1, N); // x_{j + 1}
@@ -52,11 +52,18 @@ double ComputeJ1(const int N, const double *const c, const double a, const doubl
 double ComputeJ2(const int N, const double *const c, double(*func)(double), const double a, const double b)
 {
     double res = 0;
-    for (int j = 0; j < N; j++)
+    PhiParams phiParams = {0};
+    for (int j = 1; j < N; j++)
     {
-        PhiParams phiParams = FillPhiParams(a, b, N, j);
+        phiParams = FillPhiParams(a, b, N, j);
         res += c[j] * SimpsonIntegrate(20, func, phiParams, phiParams.x_p, phiParams.x_n);
     }
+
+    phiParams = FillPhiParams(a, b, N, 0);
+    res += c[0] * SimpsonIntegrate(20, func, phiParams, phiParams.x_i, phiParams.x_n);
+
+    phiParams = FillPhiParams(a, b, N, N);
+    res += c[0] * SimpsonIntegrate(20, func, phiParams, phiParams.x_p, phiParams.x_i);
 
     return res;
 }
@@ -83,7 +90,7 @@ double MinBetween3Numbers(double a, double b, double c)
     return min;
 }
 
-double *RitzMethod(int N, double a, double b) // N is the number of basic functions
+double *RitzMethod(int N, double a, double b) // N is the index of the rightmost node
 {
     // RETURNS: an array of coefficients c_j
     double *c = (double *)calloc(N + 1, sizeof(double));
@@ -93,28 +100,28 @@ double *RitzMethod(int N, double a, double b) // N is the number of basic functi
     {
         int random_integer = rand();
         double random_value = ((double)random_integer / RAND_MAX) * 2.0 - 1.0;
-        // c[j] = random_value;
-        c[j] = 1;
+        c[j] = random_value;
+        // c[j] = 1;
     }
 
-    double *c_prev = (double *)calloc(N, sizeof(double));
+    double *c_prev = (double *)calloc(N + 1, sizeof(double));
     int CountOfIterations = 0;
-    int CountOfIterations_Max = 200;
+    int CountOfIterations_Max = 400;
 
-    double* deltas = new double[N];
+    double* deltas = new double[N + 1];
     for (int i = 0; i < N; i++)
         deltas[i] = DELTA_START;
 
     while (
-    //     ComputeErrorNorm(c, c_prev, N) > EPS 
+    //     ComputeErrorNorm(c, c_prev, N + 1) > EPS 
     // && 
     CountOfIterations <= CountOfIterations_Max
     )
     {
-        for (int j = 0; j < N; j++)
+        for (int j = 0; j < N + 1; j++)
             c_prev[j] = c[j];
 
-        int j = rand() % N;
+        int j = rand() % (N + 1);
 
         // 1) c_j - delta
         c[j] -= deltas[j];
