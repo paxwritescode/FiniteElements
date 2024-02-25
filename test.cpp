@@ -54,18 +54,29 @@ void TestRitzFunctional()
     std::cout << "J1 - correct value: " << 0 << std::endl;
 
     double J2 = ComputeJ2(N, c, f, a, b);
-    
+
     std::cout << "J2 - calculated value: " << J2 << std::endl;
     std::cout << "J2 - correct value: " << 2 << std::endl;
 
     delete[] c;
 }
 
+void TestMinBetween3Numbers()
+{
+    double a = .5, b = 1.5, c = -.5;
+    std::cout << MinBetween3Numbers(a, b, c) << std::endl;
+    std::cout << MinBetween3Numbers(b, c, a) << std::endl;
+    std::cout << MinBetween3Numbers(c, b, a) << std::endl;
+    std::cout << MinBetween3Numbers(c, a, b) << std::endl;
+}
+
+
 void Test()
 {
     TestSimpson();
     TestTridiagonal();
     TestRitzFunctional();
+    TestMinBetween3Numbers();
 }
 
 int main(void)

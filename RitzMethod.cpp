@@ -103,21 +103,26 @@ double *RitzMethod(int N, double a, double b) // N is the index of the rightmost
         c[j] = random_value;
         // c[j] = 1;
     }
+    printf("Initial values of array of coefficientd:\n");
+    for (int j = 0; j < N + 1; j++)
+        printf("%lf ", c[j]);
+    printf("\n\n");
 
     double *c_prev = (double *)calloc(N + 1, sizeof(double));
     int CountOfIterations = 0;
-    int CountOfIterations_Max = 400;
+    int CountOfIterations_Max = 5000;
 
     double* deltas = new double[N + 1];
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i <= N; i++)
         deltas[i] = DELTA_START;
 
     while (
-    //     ComputeErrorNorm(c, c_prev, N + 1) > EPS 
-    // && 
+        ComputeErrorNorm(c, c_prev, N + 1) > EPS 
+    && 
     CountOfIterations <= CountOfIterations_Max
     )
     {
+        CountOfIterations++;
         for (int j = 0; j < N + 1; j++)
             c_prev[j] = c[j];
 
@@ -125,25 +130,24 @@ double *RitzMethod(int N, double a, double b) // N is the index of the rightmost
 
         // 1) c_j - delta
         c[j] -= deltas[j];
-        double J1 = ComputeFunctionalValue(N, c, f, a, b);
+        double J_left = ComputeFunctionalValue(N, c, f, a, b);
         // 2) c_j
         c[j] += deltas[j];
-        double J2 = ComputeFunctionalValue(N, c, f, a, b);
+        double J_central = ComputeFunctionalValue(N, c, f, a, b);
         // 3) c_j + delta
         c[j] += deltas[j];
-        double J3 = ComputeFunctionalValue(N, c, f, a, b);
+        double J_right = ComputeFunctionalValue(N, c, f, a, b);
 
-        if (MinBetween3Numbers(J1, J2, J3) == J1)
+        const double tol = 1e-6;  // tolerance for float comparison
+        if (abs(MinBetween3Numbers(J_left, J_central, J_right) - J_left) < tol)
             c[j] -= 2 * deltas[j];
-        else if (MinBetween3Numbers(J1, J2, J3) == J2) // we need to decrease delta
+        else if (abs(MinBetween3Numbers(J_left, J_central, J_right) - J_central) < tol) // we need to decrease delta
         {
             c[j] -= deltas[j];
             deltas[j] /= 2;
         }
         else
-            continue;
-
-        CountOfIterations++;
+            ;
     }
 
     if (CountOfIterations > CountOfIterations_Max)
@@ -151,6 +155,13 @@ double *RitzMethod(int N, double a, double b) // N is the index of the rightmost
 
     free(c_prev);
     delete[] deltas;
+
+    printf("%d iterations\n\n", CountOfIterations);
+    
+    printf("Finite values of array of coefficientd:\n");
+    for (int j = 0; j < N + 1; j++)
+        printf("%lf ", c[j]);
+    printf("\n\n");
 
     return c;
 }
