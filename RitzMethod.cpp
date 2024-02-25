@@ -95,13 +95,13 @@ double *RitzMethod(int N, double a, double b) // N is the index of the rightmost
     // RETURNS: an array of coefficients c_j
     double *c = (double *)calloc(N + 1, sizeof(double));
     // init the array of coefficients by random values from -1 to 1
-    srand(1);
+    srand(0);
     for (int j = 0; j < N + 1; j++)
     {
         int random_integer = rand();
         double random_value = ((double)random_integer / RAND_MAX) * 2.0 - 1.0;
-        c[j] = random_value;
-        // c[j] = 1;
+        // c[j] = random_value;
+        c[j] = 1;
     }
     printf("Initial values of array of coefficientd:\n");
     for (int j = 0; j < N + 1; j++)
@@ -110,15 +110,15 @@ double *RitzMethod(int N, double a, double b) // N is the index of the rightmost
 
     double *c_prev = (double *)calloc(N + 1, sizeof(double));
     int CountOfIterations = 0;
-    int CountOfIterations_Max = 5000;
+    int CountOfIterations_Max = 100000;
 
     double* deltas = new double[N + 1];
     for (int i = 0; i <= N; i++)
         deltas[i] = DELTA_START;
 
     while (
-        ComputeErrorNorm(c, c_prev, N + 1) > EPS 
-    && 
+    //     ComputeErrorNorm(c, c_prev, N + 1) > EPS 
+    // && 
     CountOfIterations <= CountOfIterations_Max
     )
     {
