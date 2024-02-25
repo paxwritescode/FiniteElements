@@ -1,4 +1,7 @@
-#include "test.h"
+#include <cmath>
+#include <iostream>
+#include "GalerkinMethod.h"
+#include "RitzMethod.h"
 
 double TestFunc(double x)
 {
@@ -8,7 +11,7 @@ double TestFunc(double x)
 void TestSimpson()
 {
     printf("%lf - Simpson computed\n", SimpsonIntegrate(100, TestFunc, PhiParams{0, PI/2, PI}, 0, PI));
-    printf("%lf - exact\n", 4/PI);
+    printf("%lf - exact\n\n", 4/PI);
 }
 
 void TestTridiagonal()
@@ -28,7 +31,7 @@ void TestTridiagonal()
     }
 
     printf("\nCorrect:\n");
-    printf("-4, -2, 0, 2, 4");
+    printf("-4, -2, 0, 2, 4\n\n");
     
     delete[] b;
     delete[] c;
@@ -36,8 +39,36 @@ void TestTridiagonal()
     delete[] r;   
 }
 
+void TestRitzFunctional()
+{
+    std::cout << "TestRitzFunctional" << std::endl;
+    int N = 5;
+    double a = -1, b = 1;
+    double* c = new double[N + 1];
+    for (int i = 0; i < N + 1; i++)
+        c[i] = 1;
+
+    double J1 = ComputeJ1(N, c, a, b);
+
+    std::cout << "J1 - calculated value: " << J1 << std::endl;
+    std::cout << "J1 - correct value: " << 0 << std::endl;
+
+    double J2 = ComputeJ2(N, c, f, a, b);
+    
+    std::cout << "J2 - calculated value: " << J2 << std::endl;
+    std::cout << "J2 - correct value: " << 2 << std::endl;
+
+    delete[] c;
+}
+
 void Test()
 {
     TestSimpson();
     TestTridiagonal();
+    TestRitzFunctional();
+}
+
+int main(void)
+{
+    Test();
 }
