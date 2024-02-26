@@ -28,14 +28,14 @@ void TridiagonalMatrixAlgorithm(int n, double *r, double *b, double *c, double *
 void GalerkinMethod(double a, double b, int n, double *uj)
 {
     // Constructing tridiagonal Matrix
-    double *d = (double *)calloc(n, sizeof(double));  // a_(j - 1)(j), upper diagonal
-    double *c = (double *)calloc(n, sizeof(double));  // a_(j)(j), main diagonal
-    double *bm = (double *)calloc(n, sizeof(double)); // a(j + 1)(j), lower diagonal
-    double *r = (double *)calloc(n, sizeof(double));
+    double *d = (double *)calloc(n + 1, sizeof(double));  // a_(j - 1)(j), upper diagonal
+    double *c = (double *)calloc(n + 1, sizeof(double));  // a_(j)(j), main diagonal
+    double *bm = (double *)calloc(n + 1, sizeof(double)); // a(j + 1)(j), lower diagonal
+    double *r = (double *)calloc(n + 1, sizeof(double));
 
-    bm[0] = 0, d[n - 1] = 0;
+    bm[0] = 0, d[n] = 0;
 
-    for (int j = 0; j < n; j++)
+    for (int j = 0; j <= n; j++)
     {
         PhiParams phiParams = FillPhiParams(a, b, n, j);
 
@@ -44,13 +44,38 @@ void GalerkinMethod(double a, double b, int n, double *uj)
         c[j] = 1 / (phiParams.x_i - phiParams.x_p) + 1 / (phiParams.x_n - phiParams.x_i);
         if (j != 0)
             bm[j] = -1 / (phiParams.x_n - phiParams.x_i);
-        if (j != n - 1)
+        if (j != n)
             d[j] = -1 / (phiParams.x_i - phiParams.x_p);
 
         r[j] = SimpsonIntegrate(100, f, phiParams, a, b);
     }
 
-    TridiagonalMatrixAlgorithm(n, r, bm, c, d, uj);
+    // printf("\nmain diagonal:\n");
+    // for (int i = 0; i <= n; i++)
+    //     printf("%lf ", c[i]);
+    // printf("\n");
+
+    // printf("\nupper diagonal d:\n");
+    // for (int i = 0; i <= n; i++)
+    //     printf("%lf ", d[i]);
+    // printf("\n");   
+
+    // printf("\nlower diagonal b:\n");
+    // for (int i = 0; i <= n; i++)
+    //     printf("%lf ", bm[i]);
+    // printf("\n");  
+
+    // printf("\nright column r:\n");
+    // for (int i = 0; i <= n; i++)
+    //     printf("%lf ", r[i]);
+    // printf("\n");
+
+    TridiagonalMatrixAlgorithm(n + 1, r, bm, c, d, uj);
+
+    // printf("\narray of coefficients u_j\n");
+    // for (int i = 0; i <= n; i++)
+    //     printf("%lf ", uj[i]);
+    // printf("\n\n");
 
     free(d);
     free(c);
