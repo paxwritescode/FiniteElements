@@ -35,7 +35,7 @@ void GalerkinMethod(double a, double b, int n, double *uj)
 
     bm[0] = 0, d[n] = 0;
 
-    for (int j = 0; j <= n; j++)
+    for (int j = 1; j < n; j++)
     {
         PhiParams phiParams = FillPhiParams(a, b, n, j);
 
@@ -49,6 +49,9 @@ void GalerkinMethod(double a, double b, int n, double *uj)
 
         r[j] = SimpsonIntegrate(100, f, phiParams, a, b);
     }
+    
+    c[0] = 1 / (ComputeRegularGridNode(a, b, 1, n) - a);
+    c[n] = 1 / (b - ComputeRegularGridNode(a, b, n - 1, n));
 
     // printf("\nmain diagonal:\n");
     // for (int i = 0; i <= n; i++)

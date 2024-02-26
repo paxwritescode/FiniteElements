@@ -3,14 +3,14 @@
 
 double f(double x)
 {
-    return - PI * cos(PI * x / 2) + PI * PI / 4 * x * sin(PI * x / 2);
-    //return 1;
+    // return - PI * cos(PI * x / 2) + PI * PI / 4 * x * sin(PI * x / 2);
+    return 1;
 }
 
 double u_exact(double x)
 {
-    return x * sin(PI * x / 2);
-    //return -x * x / 2 + 0.5;
+    // return x * sin(PI * x / 2);
+    return -x * x / 2 + 0.5;
 }
 
 double ComputeRegularGridNode(double a, double b, int i, int n)
@@ -78,10 +78,10 @@ PhiParams FillPhiParams(double a, double b, int n, int j)
     return phiParams;
 }
 
-double ComputeErrorNorm(double* array1, double* array2, int n)
+double ComputeErrorNorm(double *array1, double *array2, int n)
 {
     double norm = 0;
-    for(int i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
         norm += sqrt((array1[i] - array2[i]) * (array1[i] - array2[i]));
     }
@@ -89,15 +89,15 @@ double ComputeErrorNorm(double* array1, double* array2, int n)
     return norm;
 }
 
-double ComputeSolution(double x, double a, double b, int n, double *uj)
+double ComputeSolution(double x, double a, double b, int n, double *c)
 {
     double u_numeric = 0;
 
-    for (int j = 0; j < n; j++)
+    for (int j = 0; j <= n; j++)
     {
         PhiParams phiParams = FillPhiParams(a, b, n, j);
 
-        u_numeric += uj[j] * phi(x, phiParams, a, b);
+        u_numeric += c[j] * phi(x, phiParams, a, b);
     }
 
     return u_numeric;

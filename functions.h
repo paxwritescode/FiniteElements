@@ -2,8 +2,8 @@
 
 #include <stdio.h>
 
-#define _A_ 0
-#define _B_ 2
+#define _A_ -1
+#define _B_ 1
 #define PI 3.1415926535897932
 #define EPS 1e-7
 #define DELTA_START 1e-2
