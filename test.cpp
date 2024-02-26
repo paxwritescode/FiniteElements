@@ -75,16 +75,24 @@ void TestMinBetween3Numbers()
     std::cout << MinBetween3Numbers(c, a, b) << std::endl;
 }
 
+double TestFuncConst(double x)
+{
+    return 1;
+}
+
 void TestCompareRitzFunctional()
 {
     printf("\nComparison of functional values:\n");
     double c_Galerkin[6] = {0.000000, 0.320000, 0.480000, 0.480000, 0.320000, 0.000000};
-    double c_Ritz_experimental[6] = {1.820547, 1.723342, 1.722717, 1.635203, 1.429290, 1.124404};
+    double c_Ritz_experimental[6] = {-0.029511, -0.076436, 0.053742, 0.111459, 0.044326, -0.029234};
 
-    double J_Galerkin = ComputeFunctionalValue(5, c_Galerkin, f, _A_, _B_);
-    double J_Ritz_experimental = ComputeFunctionalValue(5, c_Ritz_experimental, f, _A_, _B_);
+    double J_Galerkin = ComputeFunctionalValue(5, c_Galerkin, TestFuncConst, -1, 1);
+    double J_Ritz_experimental = ComputeFunctionalValue(5, c_Ritz_experimental, TestFuncConst, -1, 1);
+
+    double c_GalerkinPerturbed[6] = {.05, 0.320000, 0.480000, 0.480000, 0.320000, 0.000000};
 
     printf("Galerkin, correct: %lf\n", J_Galerkin);
+    std::cout << "Galerkin, perturbed: " << ComputeFunctionalValue(5, c_GalerkinPerturbed, TestFuncConst, -1, 1) << std::endl;
     printf("Ritz, experimental: %lf\n", J_Ritz_experimental);
 }
 

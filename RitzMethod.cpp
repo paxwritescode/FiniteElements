@@ -22,7 +22,7 @@ double ComputeJ1(const int N, const double *const c, const double a, const doubl
     res += c[N] * c[N] * (1 / (b - ComputeRegularGridNode(a, b, N - 1, N)));
 
     // upper diagonal
-    for (int j = 1; j <= N; j++)
+    for (int j = 2; j <= N - 1; j++)
     {
         double x_p = ComputeRegularGridNode(a, b, j - 1, N); // x_{j - 1}
         double x_j = ComputeRegularGridNode(a, b, j, N);
@@ -30,7 +30,7 @@ double ComputeJ1(const int N, const double *const c, const double a, const doubl
     }
 
     // lower diagonal
-    for (int j = 0; j <= N - 1; j++)
+    for (int j = 1; j <= N - 2; j++)
     {
         double x_j = ComputeRegularGridNode(a, b, j, N);
         double x_n = ComputeRegularGridNode(a, b, j + 1, N); // x_{j + 1}
@@ -59,11 +59,11 @@ double ComputeJ2(const int N, const double *const c, double(*func)(double), cons
         res += c[j] * SimpsonIntegrate(20, func, phiParams, phiParams.x_p, phiParams.x_n);
     }
 
-    phiParams = FillPhiParams(a, b, N, 0);
-    res += c[0] * SimpsonIntegrate(20, func, phiParams, phiParams.x_i, phiParams.x_n);
+    // phiParams = FillPhiParams(a, b, N, 0);
+    // res += c[0] * SimpsonIntegrate(20, func, phiParams, phiParams.x_i, phiParams.x_n);
 
-    phiParams = FillPhiParams(a, b, N, N);
-    res += c[0] * SimpsonIntegrate(20, func, phiParams, phiParams.x_p, phiParams.x_i);
+    // phiParams = FillPhiParams(a, b, N, N);
+    // res += c[N] * SimpsonIntegrate(20, func, phiParams, phiParams.x_p, phiParams.x_i);
 
     return res;
 }
@@ -96,21 +96,24 @@ double *RitzMethod(int N, double a, double b) // N is the index of the rightmost
     double *c = (double *)calloc(N + 1, sizeof(double));
     // init the array of coefficients by random values from -1 to 1
     srand(0);
+    double c_local[6] = {1.000000, 0.350000, -0.560000, 0.480000, -0.320000, 0.000000};
+    double c_Galerkin[6] = {0.000000, 0.320000, 0.480000, 0.480000, 0.320000, 0.000000};
+
     for (int j = 0; j < N + 1; j++)
     {
         int random_integer = rand();
         double random_value = ((double)random_integer / RAND_MAX) * 2.0 - 1.0;
-        // c[j] = random_value;
-        c[j] = 1;
+        c[j] = random_value;
+        //c[j] = c_local[j];
     }
-    printf("Initial values of array of coefficientd:\n");
+    printf("Initial values of array of coefficients:\n");
     for (int j = 0; j < N + 1; j++)
         printf("%lf ", c[j]);
     printf("\n\n");
 
     double *c_prev = (double *)calloc(N + 1, sizeof(double));
     int CountOfIterations = 0;
-    int CountOfIterations_Max = 100000;
+    int CountOfIterations_Max = 500000;
 
     double* deltas = new double[N + 1];
     for (int i = 0; i <= N; i++)
@@ -138,7 +141,7 @@ double *RitzMethod(int N, double a, double b) // N is the index of the rightmost
         c[j] += deltas[j];
         double J_right = ComputeFunctionalValue(N, c, f, a, b);
 
-        const double tol = 1e-6;  // tolerance for float comparison
+        const double tol = 1e-15;  // tolerance for float comparison
         if (abs(MinBetween3Numbers(J_left, J_central, J_right) - J_left) < tol)
             c[j] -= 2 * deltas[j];
         else if (abs(MinBetween3Numbers(J_left, J_central, J_right) - J_central) < tol) // we need to decrease delta
@@ -157,6 +160,11 @@ double *RitzMethod(int N, double a, double b) // N is the index of the rightmost
     delete[] deltas;
 
     printf("%d iterations\n\n", CountOfIterations);
+
+    printf("Correct values of array of coefficients:\n");
+    for (int j = 0; j < N + 1; j++)
+        printf("%lf ", c_Galerkin[j]);
+    printf("\n\n");   
     
     printf("Finite values of array of coefficientd:\n");
     for (int j = 0; j < N + 1; j++)
