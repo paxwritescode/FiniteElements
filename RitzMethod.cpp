@@ -49,7 +49,7 @@ double ComputeJ1(const int N, const double *const c, const double a, const doubl
  * @param b: right boundary
  *
  */
-double ComputeJ2(const int N, const double *const c, double(*func)(double), const double a, const double b)
+double ComputeJ2(const int N, const double *const c, double (*func)(double), const double a, const double b)
 {
     double res = 0;
     PhiParams phiParams = {0};
@@ -104,7 +104,7 @@ double *RitzMethod(int N, double a, double b) // N is the index of the rightmost
         int random_integer = rand();
         double random_value = ((double)random_integer / RAND_MAX) * 2.0 - 1.0;
         c[j] = random_value;
-        //c[j] = c_local[j];
+        // c[j] = c_local[j];
     }
     printf("Initial values of array of coefficients:\n");
     for (int j = 0; j < N + 1; j++)
@@ -115,15 +115,14 @@ double *RitzMethod(int N, double a, double b) // N is the index of the rightmost
     int CountOfIterations = 0;
     int CountOfIterations_Max = 500000;
 
-    double* deltas = new double[N + 1];
+    double *deltas = new double[N + 1];
     for (int i = 0; i <= N; i++)
         deltas[i] = DELTA_START;
 
     while (
-    //     ComputeErrorNorm(c, c_prev, N + 1) > EPS 
-    // && 
-    CountOfIterations <= CountOfIterations_Max
-    )
+        Max(deltas, N + 1) > EPS
+        &&
+        CountOfIterations <= CountOfIterations_Max)
     {
         CountOfIterations++;
         for (int j = 0; j < N + 1; j++)
@@ -141,7 +140,7 @@ double *RitzMethod(int N, double a, double b) // N is the index of the rightmost
         c[j] += deltas[j];
         double J_right = ComputeFunctionalValue(N, c, f, a, b);
 
-        const double tol = 1e-15;  // tolerance for float comparison
+        const double tol = 1e-15; // tolerance for float comparison
         if (abs(MinBetween3Numbers(J_left, J_central, J_right) - J_left) < tol)
             c[j] -= 2 * deltas[j];
         else if (abs(MinBetween3Numbers(J_left, J_central, J_right) - J_central) < tol) // we need to decrease delta
@@ -164,8 +163,8 @@ double *RitzMethod(int N, double a, double b) // N is the index of the rightmost
     printf("Correct values of array of coefficients:\n");
     for (int j = 0; j < N + 1; j++)
         printf("%lf ", c_Galerkin[j]);
-    printf("\n\n");   
-    
+    printf("\n\n");
+
     printf("Finite values of array of coefficientd:\n");
     for (int j = 0; j < N + 1; j++)
         printf("%lf ", c[j]);

@@ -3,14 +3,14 @@
 
 double f(double x)
 {
-    // return - PI * cos(PI * x / 2) + PI * PI / 4 * x * sin(PI * x / 2);
-    return 1;
+    return - PI * cos(PI * x / 2) + PI * PI / 4 * x * sin(PI * x / 2);
+    // return 1;
 }
 
 double u_exact(double x)
 {
-    // return x * sin(PI * x / 2);
-    return -x * x / 2 + 0.5;
+    return x * sin(PI * x / 2);
+    // return -x * x / 2 + 0.5;
 }
 
 double ComputeRegularGridNode(double a, double b, int i, int n)
@@ -101,4 +101,14 @@ double ComputeSolution(double x, double a, double b, int n, double *c)
     }
 
     return u_numeric;
+}
+
+double Max(double *array, int n)
+{
+    double max = array[0];
+    for (int i = 0; i < n; i++)
+        if (array[i] > max)
+            max = array[i];
+
+    return max;
 }
