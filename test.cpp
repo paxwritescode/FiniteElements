@@ -10,12 +10,14 @@ double TestFunc(double x)
 
 void TestSimpson()
 {
+    printf("Test of Simpson function\n");
     printf("%lf - Simpson computed\n", SimpsonIntegrate(100, TestFunc, PhiParams{0, PI/2, PI}, 0, PI));
     printf("%lf - exact\n\n", 4/PI);
 }
 
 void TestTridiagonal()
 {
+    printf("Test of Tridiagonal algorithm\n");
     double* b = new double[5] {0, 2, 4, 4, 2};
     double* c = new double[5] {2, 9, 17, 15, 3};
     double* d = new double[5] {1, 2, -4, -8, 0};
@@ -41,7 +43,7 @@ void TestTridiagonal()
 
 void TestRitzFunctional()
 {
-    std::cout << "TestRitzFunctional" << std::endl;
+    printf("Test of computong a functional value from Ritz method:\n");
     int N = 5;
     double a = -1, b = 1;
     double* c = new double[N + 1];
@@ -58,16 +60,32 @@ void TestRitzFunctional()
     std::cout << "J2 - calculated value: " << J2 << std::endl;
     std::cout << "J2 - correct value: " << 2 << std::endl;
 
+    std::cout << std::endl;
+
     delete[] c;
 }
 
 void TestMinBetween3Numbers()
 {
+    printf("Test of choosing minimum of three numbers: \n");
     double a = .5, b = 1.5, c = -.5;
     std::cout << MinBetween3Numbers(a, b, c) << std::endl;
     std::cout << MinBetween3Numbers(b, c, a) << std::endl;
     std::cout << MinBetween3Numbers(c, b, a) << std::endl;
     std::cout << MinBetween3Numbers(c, a, b) << std::endl;
+}
+
+void TestCompareRitzFunctional()
+{
+    printf("\nComparison of functional values:\n");
+    double c_Galerkin[6] = {0.000000, 0.320000, 0.480000, 0.480000, 0.320000, 0.000000};
+    double c_Ritz_experimental[6] = {1.820547, 1.723342, 1.722717, 1.635203, 1.429290, 1.124404};
+
+    double J_Galerkin = ComputeFunctionalValue(5, c_Galerkin, f, _A_, _B_);
+    double J_Ritz_experimental = ComputeFunctionalValue(5, c_Ritz_experimental, f, _A_, _B_);
+
+    printf("Galerkin, correct: %lf\n", J_Galerkin);
+    printf("Ritz, experimental: %lf\n", J_Ritz_experimental);
 }
 
 
@@ -77,6 +95,7 @@ void Test()
     TestTridiagonal();
     TestRitzFunctional();
     TestMinBetween3Numbers();
+    TestCompareRitzFunctional();
 }
 
 int main(void)
