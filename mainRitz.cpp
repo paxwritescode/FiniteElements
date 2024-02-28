@@ -4,7 +4,9 @@
 
 int main(void)
 {
-    int N = 5;
+    int N = 10;
+    printf("Ritz method, %d nodes\n\n", N);
+    printf("%d nodes\n\n", N + 1);
     double *c = RitzMethod(N, _A_, _B_);
     for (double x = _A_; x <= _B_ + 0.0001; x += 0.1)
     {

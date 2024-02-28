@@ -96,78 +96,93 @@ double *RitzMethod(int N, double a, double b) // N is the index of the rightmost
     double *c = (double *)calloc(N + 1, sizeof(double));
     // init the array of coefficients by random values from -1 to 1
     srand(0);
-    double c_local[6] = {1.000000, 0.350000, -0.560000, 0.480000, -0.320000, 0.000000};
-    double c_Galerkin[6] = {0.000000, 0.320000, 0.480000, 0.480000, 0.320000, 0.000000};
+    double c_local[11] = {0.000000, 0.000000, 0.000000, 0.485410, 0.760845, 1.000000, 1.141268, 1.132624, 0.940456, 0.556231, 0.000000};
+    double c_Galerkin[11] = {0.000000, 0.061803, 0.235114, 0.485410, 0.760845, 1.000000, 1.141268, 1.132624, 0.940456, 0.556231, 0.000000};
 
-    for (int j = 0; j < N + 1; j++)
+    for (int j = 0; j <= N; j++)
     {
         int random_integer = rand();
         double random_value = ((double)random_integer / RAND_MAX) * 2.0 - 1.0;
-        c[j] = random_value;
-        // c[j] = c_local[j];
+        // c[j] = random_value;
+        // c[j] = c_Galerkin[j];
+        c[j] = c_local[j];
     }
+    c[0] = 0; c[N] = 0;
+
     printf("Initial values of array of coefficients:\n");
     for (int j = 0; j < N + 1; j++)
-        printf("%lf ", c[j]);
+        printf("%lf, ", c[j]);
     printf("\n\n");
 
     double *c_prev = (double *)calloc(N + 1, sizeof(double));
     int CountOfIterations = 0;
-    int CountOfIterations_Max = 500000;
+    int CountOfIterations_Max = 50000;
 
     double *deltas = new double[N + 1];
     for (int i = 0; i <= N; i++)
         deltas[i] = DELTA_START;
+    // double delta = DELTA_START;
 
     while (
-        Max(deltas, N + 1) > EPS
+        Max(deltas, N) > DELTA_MIN
         &&
         CountOfIterations <= CountOfIterations_Max)
     {
-        CountOfIterations++;
-        for (int j = 0; j < N + 1; j++)
-            c_prev[j] = c[j];
-
-        int j = rand() % (N + 1);
-
-        // 1) c_j - delta
-        c[j] -= deltas[j];
-        double J_left = ComputeFunctionalValue(N, c, f, a, b);
-        // 2) c_j
-        c[j] += deltas[j];
-        double J_central = ComputeFunctionalValue(N, c, f, a, b);
-        // 3) c_j + delta
-        c[j] += deltas[j];
-        double J_right = ComputeFunctionalValue(N, c, f, a, b);
-
-        const double tol = 1e-15; // tolerance for float comparison
-        if (abs(MinBetween3Numbers(J_left, J_central, J_right) - J_left) < tol)
-            c[j] -= 2 * deltas[j];
-        else if (abs(MinBetween3Numbers(J_left, J_central, J_right) - J_central) < tol) // we need to decrease delta
+        if ((CountOfIterations % 10 == 0 && CountOfIterations < 401) || (CountOfIterations < 10))
         {
-            c[j] -= deltas[j];
-            deltas[j] /= 2;
+            printf("delta = %.20lf, %d iterations\n", Max(deltas, N + 1), CountOfIterations);
+            printf("functional value = %.10lf\n\n", ComputeFunctionalValue(N, c, f, a, b));
         }
-        else
-            ;
+        CountOfIterations++;
+
+        for (int j = 0; j < N + 1; j++)
+        {
+            if(c_prev[j] != c[j])
+                c_prev[j] = c[j];
+        }
+
+       for (int j = 0; j <= N; j++)
+       {
+            // 1) c_j - delta
+            c[j] -= deltas[j];
+            double J_left = ComputeFunctionalValue(N, c, f, a, b);
+            // 2) c_j
+            c[j] += deltas[j];
+            double J_central = ComputeFunctionalValue(N, c, f, a, b);
+            // 3) c_j + delta
+            c[j] += deltas[j];
+            double J_right = ComputeFunctionalValue(N, c, f, a, b);
+
+            const double tol = 1e-20; // tolerance for float comparison
+            if (abs(MinBetween3Numbers(J_left, J_central, J_right) - J_left) < tol)
+                c[j] -= 2 * deltas[j];
+            else if (abs(MinBetween3Numbers(J_left, J_central, J_right) - J_central) < tol) // we need to decrease delta
+            {
+                c[j] -= deltas[j];
+                deltas[j] /= 2;
+            }
+            else
+                ;
+       }
+
     }
 
     if (CountOfIterations > CountOfIterations_Max)
         printf("The method did not converge!!!\n\n");
 
     free(c_prev);
-    delete[] deltas;
+    // delete[] deltas;
 
     printf("%d iterations\n\n", CountOfIterations);
 
     printf("Correct values of array of coefficients:\n");
     for (int j = 0; j < N + 1; j++)
-        printf("%lf ", c_Galerkin[j]);
+        printf("%lf, ", c_Galerkin[j]);
     printf("\n\n");
 
-    printf("Finite values of array of coefficientd:\n");
+    printf("Finite values of array of coefficients:\n");
     for (int j = 0; j < N + 1; j++)
-        printf("%lf ", c[j]);
+        printf("%lf, ", c[j]);
     printf("\n\n");
 
     return c;

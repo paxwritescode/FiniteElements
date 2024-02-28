@@ -39,15 +39,13 @@ void GalerkinMethod(double a, double b, int n, double *uj)
     {
         PhiParams phiParams = FillPhiParams(a, b, n, j);
 
-        // TODO boundaries
-
         c[j] = 1 / (phiParams.x_i - phiParams.x_p) + 1 / (phiParams.x_n - phiParams.x_i);
         if (j != 0)
             bm[j] = -1 / (phiParams.x_n - phiParams.x_i);
         if (j != n)
             d[j] = -1 / (phiParams.x_i - phiParams.x_p);
 
-        r[j] = SimpsonIntegrate(100, f, phiParams, a, b);
+        r[j] = SimpsonIntegrate(200, f, phiParams, a, b);
     }
 
     c[0] = 1 / (ComputeRegularGridNode(a, b, 1, n) - a);
@@ -75,10 +73,10 @@ void GalerkinMethod(double a, double b, int n, double *uj)
 
     TridiagonalMatrixAlgorithm(n + 1, r, bm, c, d, uj);
 
-    printf("\narray of coefficients u_j\n");
-    for (int i = 0; i <= n; i++)
-        printf("%lf ", uj[i]);
-    printf("\n\n");
+    // printf("\narray of coefficients u_j\n");
+    // for (int i = 0; i <= n; i++)
+    //     printf("%lf ", uj[i]);
+    // printf("\n\n");
 
     free(d);
     free(c);

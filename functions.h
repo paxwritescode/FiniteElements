@@ -5,8 +5,8 @@
 #define _A_ 0
 #define _B_ 2
 #define PI 3.1415926535897932
-#define EPS 1e-7
-#define DELTA_START 1e-2
+#define DELTA_MIN 1e-7
+#define DELTA_START 0.5
 
 struct PhiParams
 {
